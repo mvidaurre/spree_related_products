@@ -1,12 +1,8 @@
-lib = File.expand_path('../lib/', __FILE__)
-$LOAD_PATH.unshift lib unless $LOAD_PATH.include?(lib)
-
-require 'spree_related_products/version'
 
 Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.name        = 'spree_related_products'
-  s.version     = SpreeRelatedProducts.version
+  s.version     = "3.2.0"
   s.summary     = 'Allows multiple types of relationships between products to be defined'
   s.description = s.summary
   s.required_ruby_version = '>= 2.1.0'
