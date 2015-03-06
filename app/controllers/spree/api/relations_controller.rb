@@ -1,8 +1,8 @@
 module Spree
   module Api
     class RelationsController < Spree::Api::BaseController
-      before_filter :load_data, :only => [:create, :destroy]
-      before_filter :find_relation, only: [:update, :destroy]
+      before_action :load_data, only: [:create, :destroy]
+      before_action :find_relation, only: [:update, :destroy]
 
       def create
         authorize! :create, Relation
@@ -28,11 +28,11 @@ module Spree
       def update_positions
         authorize! :update, Relation
         params[:positions].each do |id, index|
-          model_class.where(:id => id).update_all(:position => index)
+          model_class.where(id: id).update_all(position: index)
         end
 
         respond_to do |format|
-          format.js  { render :text => 'Ok' }
+          format.js { render text: 'Ok' }
         end
       end
 
@@ -45,7 +45,20 @@ module Spree
       private
 
       def relation_params
-        params.require(:relation).permit(:related_to, :relation_type, :relatable, :related_to_id, :discount_amount, :relation_type_id, :related_to_type, :position)
+        params.require(:relation).permit(*permitted_attributes)
+      end
+
+      def permitted_attributes
+        [
+          :related_to,
+          :relation_type,
+          :relatable,
+          :related_to_id,
+          :discount_amount,
+          :relation_type_id,
+          :related_to_type,
+          :position
+        ]
       end
 
       def load_data

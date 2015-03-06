@@ -1,5 +1,5 @@
 Spree::Product.class_eval do
-  has_many :relations, -> { order(:position) }, :as => :relatable
+  has_many :relations, -> { order(:position) }, as: :relatable
 
   # When a Spree::Product is destroyed, we also want to destroy all Spree::Relations
   # "from" it as well as "to" it.
@@ -7,7 +7,7 @@ Spree::Product.class_eval do
 
   # Returns all the Spree::RelationType's which apply_to this class.
   def self.relation_types
-    Spree::RelationType.where(:applies_to => self.to_s).order(:name)
+    Spree::RelationType.where(applies_to: to_s).order(:name)
   end
 
   # The AREL Relations that will be used to filter the resultant items.
@@ -26,10 +26,10 @@ Spree::Product.class_eval do
   # This could also feasibly be overridden to sort the result in a
   # particular order, or restrict the number of items returned.
   def self.relation_filter
-    where('spree_products.deleted_at' => nil).
-    where('spree_products.available_on IS NOT NULL').
-    where('spree_products.available_on <= ?', Time.now).
-    references(self)
+    where('spree_products.deleted_at' => nil)
+      .where('spree_products.available_on IS NOT NULL')
+      .where('spree_products.available_on <= ?', Time.now)
+      .references(self)
   end
 
   # Decides if there is a relevant Spree::RelationType related to this class
@@ -55,23 +55,20 @@ Spree::Product.class_eval do
 
   def destroy_product_relations
     # First we destroy relationships "from" this Product to others.
-    self.relations.destroy_all
+    relations.destroy_all
     # Next we destroy relationships "to" this Product.
-    Spree::Relation.where(related_to_type: self.class.to_s).where(related_to_id: self.id).destroy_all
+    Spree::Relation.where(related_to_type: self.class.to_s).where(related_to_id: id).destroy_all
   end
 
   private
 
   def find_relation_type(relation_name)
-    begin
-      self.class.relation_types.detect { |rt| rt.name.downcase.gsub(" ", "_").pluralize == relation_name.to_s.downcase }
-    rescue ActiveRecord::StatementInvalid => error
-      # This exception is throw if the relation_types table does not exist.
-      # And this method is getting invoked during the execution of a migration
-      # from another extension when both are used in a project.
-      nil
-    end
-
+    self.class.relation_types.detect { |rt| rt.name.downcase.gsub(' ', '_').pluralize == relation_name.to_s.downcase }
+  rescue ActiveRecord::StatementInvalid
+    # This exception is throw if the relation_types table does not exist.
+    # And this method is getting invoked during the execution of a migration
+    # from another extension when both are used in a project.
+    nil
   end
 
   # Returns all the Products that are related to this record for the given RelationType.
@@ -80,10 +77,10 @@ Spree::Product.class_eval do
   # them using +Product.relation_filter+ to remove unwanted items.
   def relations_for_relation_type(relation_type)
     # Find all the relations that belong to us for this RelationType, ordered by position
-    related_ids = relations.where(:relation_type_id => relation_type.id).order(:position).pluck(:related_to_id)
+    related_ids = relations.where(relation_type_id: relation_type.id).order(:position).pluck(:related_to_id)
 
     # Construct a query for all these records
-    result = self.class.where(:id => related_ids)
+    result = self.class.where(id: related_ids)
 
     # Merge in the relation_filter if it's available
     result = result.merge(self.class.relation_filter) if relation_filter

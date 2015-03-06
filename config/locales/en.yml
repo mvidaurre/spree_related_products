@@ -1,13 +1,18 @@
+---
 en:
+  activerecord:
+    models:
+      spree/relation:
+        one: Relation
+        other: Relations
+      spree/relation_type:
+        one: Relation Type
+        other: Relation Types
   spree:
-    back_to_relation_types_list: Back To Relation Types List
     new_relation_type: New Relation Type
     related_product_discount: Related Product Discount
-    relation_types: Relation Types
     applies_to: Applies To
-    editing_relation_type: Editing Relation Type
     related_products: Related Products
     add_related_product: Add Related Product
-    name_or_sku: Name or SKU
-    manage_relation_types: Manage Relation Types
+    name_or_sku_short: Name or SKU
     no_relation_types: You need to configure Relation Types before you can use this feature.
